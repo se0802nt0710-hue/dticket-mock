@@ -1,64 +1,440 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>d ticket</title>
-<style>
-body {
-margin:0;
-font-family:-apple-system, BlinkMacSystemFont;
-background:linear-gradient(#051126,#173f83);
-color:white;
-}
-.header{
-background:#15c7c7;
-padding:14px;
-text-align:center;
-font-weight:bold;
-}
-.ticket{
-margin:40px auto;
-width:280px;
-background:black;
-padding:16px;
-border-radius:10px;
-}
-.qr{
-width:180px;
-height:180px;
-background:white;
-margin:0 auto 10px;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-.qr svg{
-width:140px;
-height:140px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>マイチケット</title>
+  <style>
+    :root {
+      --teal: #21c7c8;
+      --bg-top: #04112a;
+      --bg-mid: #082259;
+      --bg-bottom: #1c478d;
+      --ticket-border: rgba(255,255,255,0.38);
+      --strip: #f2f2f2;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+      color: #fff;
+      background:
+        radial-gradient(circle at 18% 31%, rgba(42,89,210,.36), transparent 22%),
+        radial-gradient(circle at 75% 68%, rgba(35,108,255,.22), transparent 18%),
+        radial-gradient(circle at 46% 56%, rgba(7,29,86,.38), transparent 27%),
+        linear-gradient(180deg, var(--bg-top) 0%, #061633 18%, var(--bg-mid) 58%, var(--bg-bottom) 100%);
+    }
+
+    .app {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .header {
+      height: 80px;
+      background: var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.14);
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      text-shadow: 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .content {
+      padding: 70px 0 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ticket {
+      width: min(78vw, 282px);
+      background: #000;
+      border: 1px solid var(--ticket-border);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(0,0,0,.28);
+    }
+
+    .ticket-top {
+      height: 118px;
+      position: relative;
+      background:
+        radial-gradient(circle at 14% 32%, rgba(44,79,219,.92), transparent 22%),
+        radial-gradient(circle at 31% 66%, rgba(36,182,196,.38), transparent 20%),
+        radial-gradient(circle at 78% 16%, rgba(90,229,255,.52), transparent 15%),
+        radial-gradient(circle at 82% 58%, rgba(22,107,154,.5), transparent 20%),
+        linear-gradient(135deg, #071748 2%, #173890 24%, #0a1f57 46%, #0f3567 67%, #0a203f 100%);
+    }
+
+    .info-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255,255,255,.92);
+      background: rgba(110,198,255,.18);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .qr-panel {
+      position: absolute;
+      left: 97px;
+      top: 13px;
+      width: 87px;
+      height: 84px;
+      background: #f3f3f3;
+      border-radius: 3px 3px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .qr-svg {
+      width: 73px;
+      height: 73px;
+      display: block;
+      shape-rendering: crispEdges;
+    }
+
+    .warning {
+      position: absolute;
+      right: 7px;
+      top: 38px;
+      width: 118px;
+      padding: 6px 7px 5px;
+      background: rgba(0,0,0,.5);
+      font-size: 8px;
+      line-height: 1.34;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+
+    .name-strip {
+      height: 20px;
+      background: var(--strip);
+      color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 10px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .ticket-body {
+      min-height: 422px;
+      padding: 12px 12px 18px;
+    }
+
+    .head {
+      display: grid;
+      grid-template-columns: 1fr 50px;
+      gap: 9px;
+      align-items: start;
+    }
+
+    .date {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: .98;
+      letter-spacing: -.01em;
+      margin-bottom: 2px;
+    }
+
+    .date .main {
+      font-size: 27px;
+      letter-spacing: -.03em;
+      margin-right: 2px;
+    }
+
+    .venue, .time, .sub {
+      font-size: 11px;
+      line-height: 1.12;
+      font-weight: 700;
+    }
+
+    .sub {
+      font-weight: 500;
+      margin-top: 1px;
+    }
+
+    .logo {
+      width: 47px;
+      height: 47px;
+      position: relative;
+      background: #ea164d;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .logo::before,
+    .logo::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      opacity: .95;
+      transform: rotate(12deg);
+    }
+
+    .logo::before {
+      width: 46px;
+      height: 46px;
+      left: 20px;
+      top: -8px;
+    }
+
+    .logo::after {
+      width: 61px;
+      height: 61px;
+      left: 8px;
+      top: 16px;
+      border-width: 5px;
+    }
+
+    .logo-text {
+      position: absolute;
+      inset: 5px 4px auto 5px;
+      z-index: 1;
+      color: #111;
+      font-size: 7px;
+      line-height: 1.03;
+      font-weight: 900;
+      letter-spacing: -.01em;
+    }
+
+    .title {
+      margin-top: 5px;
+      max-width: 220px;
+      font-size: 11px;
+      line-height: 1.02;
+      font-weight: 900;
+      letter-spacing: -.02em;
+    }
+
+    .meta {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      column-gap: 10px;
+      row-gap: 3px;
+      font-size: 10px;
+      line-height: 1.18;
+    }
+
+    .meta .label,
+    .meta .value {
+      font-weight: 700;
+    }
+
+    .pager {
+      display: flex;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .pager-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.45);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.08);
+    }
+
+    .pager-dot.active { background: #fff; }
+
+    .footer-pill {
+      margin-top: 28px;
+      width: min(86vw, 320px);
+      min-height: 34px;
+      background: #fff;
+      border-radius: 999px;
+      color: #222;
+      padding: 4px 10px 4px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 5px 12px rgba(0,0,0,.18);
+      font-size: 11px;
+    }
+
+    .gear {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #000;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 390px) {
+      .header { height: 60px; }
+      .header-title { font-size: 18px; }
+      .content { padding-top: 48px; }
+      .ticket { width: min(74vw, 280px); }
+      .footer-pill { width: min(90vw, 320px); }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <header class="header">
+      <div class="header-title">マイチケット</div>
+    </header>
 
-<div class="header">マイチケット</div>
+    <main class="content">
+      <section class="ticket" aria-label="チケット">
+        <div class="ticket-top">
+          <div class="info-badge">i</div>
 
-<div class="ticket">
+          <div class="qr-panel" aria-label="QRコード">
+            <svg class="qr-svg" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR">
+              <rect width="21" height="21" fill="#fff"/>
+              <rect x="0" y="0" width="7" height="7" fill="#000"/>
+              <rect x="1" y="1" width="5" height="5" fill="#fff"/>
+              <rect x="2" y="2" width="3" height="3" fill="#000"/>
+              <rect x="14" y="0" width="7" height="7" fill="#000"/>
+              <rect x="15" y="1" width="5" height="5" fill="#fff"/>
+              <rect x="16" y="2" width="3" height="3" fill="#000"/>
+              <rect x="0" y="14" width="7" height="7" fill="#000"/>
+              <rect x="1" y="15" width="5" height="5" fill="#fff"/>
+              <rect x="2" y="16" width="3" height="3" fill="#000"/>
+              <g fill="#000">
+                <rect x="8" y="1" width="1" height="1"/>
+                <rect x="10" y="1" width="1" height="1"/>
+                <rect x="12" y="1" width="1" height="1"/>
+                <rect x="8" y="3" width="1" height="1"/>
+                <rect x="9" y="3" width="1" height="1"/>
+                <rect x="10" y="3" width="1" height="1"/>
+                <rect x="12" y="3" width="1" height="1"/>
+                <rect x="8" y="5" width="1" height="1"/>
+                <rect x="9" y="5" width="1" height="1"/>
+                <rect x="11" y="5" width="1" height="1"/>
+                <rect x="12" y="5" width="1" height="1"/>
+                <rect x="7" y="8" width="1" height="1"/>
+                <rect x="9" y="8" width="1" height="1"/>
+                <rect x="10" y="8" width="1" height="1"/>
+                <rect x="12" y="8" width="1" height="1"/>
+                <rect x="14" y="8" width="1" height="1"/>
+                <rect x="16" y="8" width="1" height="1"/>
+                <rect x="8" y="9" width="1" height="1"/>
+                <rect x="10" y="9" width="1" height="1"/>
+                <rect x="11" y="9" width="1" height="1"/>
+                <rect x="13" y="9" width="1" height="1"/>
+                <rect x="15" y="9" width="1" height="1"/>
+                <rect x="17" y="9" width="1" height="1"/>
+                <rect x="7" y="10" width="1" height="1"/>
+                <rect x="9" y="10" width="1" height="1"/>
+                <rect x="12" y="10" width="1" height="1"/>
+                <rect x="13" y="10" width="1" height="1"/>
+                <rect x="16" y="10" width="1" height="1"/>
+                <rect x="18" y="10" width="1" height="1"/>
+                <rect x="8" y="11" width="1" height="1"/>
+                <rect x="9" y="11" width="1" height="1"/>
+                <rect x="11" y="11" width="1" height="1"/>
+                <rect x="14" y="11" width="1" height="1"/>
+                <rect x="15" y="11" width="1" height="1"/>
+                <rect x="17" y="11" width="1" height="1"/>
+                <rect x="8" y="12" width="1" height="1"/>
+                <rect x="10" y="12" width="1" height="1"/>
+                <rect x="12" y="12" width="1" height="1"/>
+                <rect x="13" y="12" width="1" height="1"/>
+                <rect x="15" y="12" width="1" height="1"/>
+                <rect x="18" y="12" width="1" height="1"/>
+                <rect x="7" y="13" width="1" height="1"/>
+                <rect x="9" y="13" width="1" height="1"/>
+                <rect x="11" y="13" width="1" height="1"/>
+                <rect x="14" y="13" width="1" height="1"/>
+                <rect x="16" y="13" width="1" height="1"/>
+                <rect x="17" y="13" width="1" height="1"/>
+                <rect x="8" y="14" width="1" height="1"/>
+                <rect x="10" y="14" width="1" height="1"/>
+                <rect x="12" y="14" width="1" height="1"/>
+                <rect x="15" y="14" width="1" height="1"/>
+                <rect x="18" y="14" width="1" height="1"/>
+                <rect x="8" y="16" width="1" height="1"/>
+                <rect x="9" y="16" width="1" height="1"/>
+                <rect x="11" y="16" width="1" height="1"/>
+                <rect x="12" y="16" width="1" height="1"/>
+                <rect x="14" y="16" width="1" height="1"/>
+                <rect x="16" y="16" width="1" height="1"/>
+                <rect x="18" y="16" width="1" height="1"/>
+                <rect x="8" y="18" width="1" height="1"/>
+                <rect x="10" y="18" width="1" height="1"/>
+                <rect x="11" y="18" width="1" height="1"/>
+                <rect x="13" y="18" width="1" height="1"/>
+                <rect x="15" y="18" width="1" height="1"/>
+                <rect x="17" y="18" width="1" height="1"/>
+              </g>
+            </svg>
+          </div>
 
-<div class="qr">
-<svg viewBox="0 0 21 21">
-<rect width="21" height="21" fill="white"/>
-<rect x="0" y="0" width="7" height="7" fill="black"/>
-<rect x="14" y="0" width="7" height="7" fill="black"/>
-<rect x="0" y="14" width="7" height="7" fill="black"/>
-</svg>
-</div>
+          <div class="warning">【特定チケット】<br>無断有償譲渡禁止<br>本券は購入者の氏名・<br>連絡先を確認の上販売<br>されています。</div>
+        </div>
 
-<div>4/4(土)</div>
-<div>MUFG STADIUM（国立競技場）</div>
+        <div class="name-strip">夏目 敏之</div>
 
-</div>
+        <div class="ticket-body">
+          <div class="head">
+            <div>
+              <div class="date"><span class="main">4/4</span>(土)</div>
+              <div class="venue">MUFG STADIUM（国立競技場）</div>
+              <div class="time">開場(予定) 15:30　開始 17:30</div>
+              <div class="sub">docomo presents</div>
+            </div>
+            <div class="logo" aria-hidden="true">
+              <div class="logo-text">THE<br>MUSIC<br>STADIUM<br>2026</div>
+            </div>
+          </div>
 
+          <div class="title">THE MUSIC STADIUM 2026 organized by ONE OK ROCK</div>
+
+          <div class="meta">
+            <div class="label">席種</div><div class="value">指定席 / 共通</div>
+            <div class="label">座席</div><div class="value">第5ゲート<br>アリーナ H6ブロック 13列 8番</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="pager" aria-hidden="true">
+        <div class="pager-dot active"></div>
+        <div class="pager-dot"></div>
+      </div>
+
+      <div class="footer-pill">
+        <span>お客さまご利用端末からの情報の外部送信について</span>
+        <span class="gear">⚙</span>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
